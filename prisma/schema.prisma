@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Vet {
+  id           String        @id @default(cuid())
+  name         String        
+  email        String?       @unique
+  phone        String?
+  appointments Appointment[] @relation("VetAppointments")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Owner {
+  id           String        @id @default(cuid())
+  name         String
+  email        String?       @unique
+  phone        String?
+  pets         Pet[]
+  appointments Appointment[] @relation("OwnerAppointments")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Pet {
+  id           String        @id @default(cuid())
+  name         String
+  species      String?
+  breed        String?
+  owner        Owner         @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  appointments Appointment[] @relation("PetAppointments")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Room {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  location     String?
+  appointments Appointment[] @relation("RoomAppointments")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  petName   String
+  ownerName String
+  type      String
+  status    String
+  notes     String?
+  duration  Int
+  startAt   DateTime
+  endAt     DateTime
+
+  // Relations
+  vet   Vet?   @relation("VetAppointments", fields: [vetId], references: [id])
+  vetId String?
+
+  room  Room?  @relation("RoomAppointments", fields: [roomId], references: [id])
+  roomId String?
+
+  owner Owner? @relation("OwnerAppointments", fields: [ownerId], references: [id])
+  ownerId String?
+
+  pet   Pet?   @relation("PetAppointments", fields: [petId], references: [id])
+  petId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startAt])
+  @@index([endAt])
+  @@index([vetId])
+  @@index([roomId])
+  @@index([ownerId])
+  @@index([petId])
+}
