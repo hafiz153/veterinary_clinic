@@ -115,7 +115,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-red-400">
+          <h1 className="text-3xl font-bold text-primary-600">
             Today's Appointmentstttt
           </h1>
           <p className="text-gray-600">
