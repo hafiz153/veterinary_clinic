@@ -2,6 +2,7 @@ import { Appointment } from "@/lib/types";
 import AppointmentCard from "./AppointmentCard";
 import AppointmentListItem from "./AppointmentListItem";
 import EmptyState from "./EmptyState";
+import { User } from "lucide-react";
 
 export type ViewType = "card" | "list";
 
@@ -54,6 +55,9 @@ export default function AppointmentsList({
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Veterinarian
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Room
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Time

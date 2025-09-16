@@ -73,7 +73,6 @@ async function main() {
       name: "Buddy",
       species: "Dog",
       breed: "Golden Retriever",
-      ownerId: owner1.id,
     },
   });
 
@@ -82,7 +81,6 @@ async function main() {
       name: "Whiskers",
       species: "Cat",
       breed: "Persian",
-      ownerId: owner2.id,
     },
   });
 
@@ -91,7 +89,6 @@ async function main() {
       name: "Max",
       species: "Dog",
       breed: "German Shepherd",
-      ownerId: owner3.id,
     },
   });
 
@@ -110,8 +107,6 @@ async function main() {
       endAt: new Date(today.getTime() + 9.5 * 60 * 60 * 1000), // 9:30 AM
       vetId: vet1.id,
       roomId: room1.id,
-      ownerId: owner1.id,
-      petId: pet1.id,
       notes: "Annual vaccination checkup",
     },
   });
@@ -127,8 +122,6 @@ async function main() {
       endAt: new Date(today.getTime() + 10.75 * 60 * 60 * 1000), // 10:45 AM
       vetId: vet2.id,
       roomId: room2.id,
-      ownerId: owner2.id,
-      petId: pet2.id,
       notes: "Regular health checkup",
     },
   });
@@ -144,8 +137,6 @@ async function main() {
       endAt: new Date(today.getTime() + 16 * 60 * 60 * 1000), // 4 PM
       vetId: vet1.id,
       roomId: room3.id,
-      ownerId: owner3.id,
-      petId: pet3.id,
       notes: "Spay surgery",
     },
   });

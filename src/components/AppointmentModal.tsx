@@ -52,7 +52,6 @@ export default function AppointmentModal({
       notes: "",
     },
   });
-  console.log({ errors });
 
   // Load vets and rooms when modal opens
   useEffect(() => {
@@ -228,7 +227,9 @@ export default function AppointmentModal({
                   Type *
                 </label>
                 <select {...register("type")} className="input">
-                  <option selected value="">Select a type</option>
+                  <option value="">
+                    Select a type
+                  </option>
                   <option value="checkup">Checkup</option>
                   <option value="vaccination">Vaccination</option>
                   <option value="surgery">Surgery</option>
@@ -242,17 +243,6 @@ export default function AppointmentModal({
                   </p>
                 )}
               </div>
-
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select {...register("status")} className="input">
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -331,6 +321,18 @@ export default function AppointmentModal({
                   </p>
                 )}
               </div>
+              {isEditing && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select {...register("status")} className="input">
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Notes */}

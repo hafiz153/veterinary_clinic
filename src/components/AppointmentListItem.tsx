@@ -83,6 +83,17 @@ export default function AppointmentListItem({
           </span>
         )}
       </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {appointment.room && (
+          <span
+            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeBadgeClass(
+              appointment?.room?.name
+            )}`}
+          >
+            {appointment?.room?.name}
+          </span>
+        )}
+      </td>
       {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         <div>{formatTime(appointment.startAt)}</div>
         {appointment.endAt && (

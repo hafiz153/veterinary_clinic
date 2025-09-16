@@ -17,28 +17,6 @@ model Vet {
   updatedAt    DateTime      @updatedAt
 }
 
-model Owner {
-  id           String        @id @default(cuid())
-  name         String
-  email        String?       @unique
-  phone        String?
-  pets         Pet[]
-  appointments Appointment[] @relation("OwnerAppointments")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
-
-model Pet {
-  id           String        @id @default(cuid())
-  name         String
-  species      String?
-  breed        String?
-  owner        Owner         @relation(fields: [ownerId], references: [id])
-  ownerId      String
-  appointments Appointment[] @relation("PetAppointments")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
 
 model Room {
   id           String        @id @default(cuid())
@@ -67,12 +45,6 @@ model Appointment {
   room  Room?  @relation("RoomAppointments", fields: [roomId], references: [id])
   roomId String?
 
-  owner Owner? @relation("OwnerAppointments", fields: [ownerId], references: [id])
-  ownerId String?
-
-  pet   Pet?   @relation("PetAppointments", fields: [petId], references: [id])
-  petId String?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -80,6 +52,4 @@ model Appointment {
   @@index([endAt])
   @@index([vetId])
   @@index([roomId])
-  @@index([ownerId])
-  @@index([petId])
 }

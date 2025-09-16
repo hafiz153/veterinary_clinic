@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
-import { UpdateAppointmentSchema } from '@/lib/types'
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { UpdateAppointmentSchema } from "@/lib/types";
 
 export async function GET(
   request: NextRequest,
@@ -11,43 +11,43 @@ export async function GET(
       where: { id: params.id },
       include: {
         vet: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         room: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         owner: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         pet: {
-          select: { id: true, name: true }
-        }
-      }
-    })
-
+          select: { id: true, name: true },
+        },
+      },
+    });
+    console.log({ appointment });
     if (!appointment) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Appointment not found'
+          error: "Appointment not found",
         },
         { status: 404 }
-      )
+      );
     }
 
     return NextResponse.json({
       success: true,
-      data: appointment
-    })
+      data: appointment,
+    });
   } catch (error) {
-    console.error('Error fetching appointment:', error)
+    console.error("Error fetching appointment:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch appointment'
+        error: "Failed to fetch appointment",
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -56,8 +56,11 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json()
-    
+    const body = await request.json();
+
+    console.log({body})
+    console.log({id:params.id})
+
     // If we're just updating status, allow partial update
     if (Object.keys(body).length === 1 && body.status) {
       const appointment = await prisma.appointment.update({
@@ -65,23 +68,26 @@ export async function PATCH(
         data: { status: body.status },
         include: {
           vet: {
-            select: { id: true, name: true }
+            select: { id: true, name: true },
           },
           room: {
-            select: { id: true, name: true }
-          }
-        }
-      })
+            select: { id: true, name: true },
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
-        data: appointment
-      })
+        data: appointment,
+      });
     }
 
     // For full updates, validate the data
-    const validatedData = UpdateAppointmentSchema.parse({ ...body, id: params.id })
-    
+    const validatedData = UpdateAppointmentSchema.parse({
+      ...body,
+      id: params.id,
+    });
+
     let updateData: any = {
       petName: validatedData.petName,
       ownerName: validatedData.ownerName,
@@ -89,15 +95,17 @@ export async function PATCH(
       status: validatedData.status,
       notes: validatedData.notes,
       duration: validatedData.duration,
-    }
+    };
 
     // Handle datetime updates
     if (validatedData.startAt) {
-      const startAt = new Date(validatedData.startAt)
-      const endAt = new Date(startAt.getTime() + (validatedData.duration || 30) * 60 * 1000)
-      
-      updateData.startAt = startAt
-      updateData.endAt = endAt
+      const startAt = new Date(validatedData.startAt);
+      const endAt = new Date(
+        startAt.getTime() + (validatedData.duration || 30) * 60 * 1000
+      );
+
+      updateData.startAt = startAt;
+      updateData.endAt = endAt;
 
       // Check for conflicts if vet or room is specified (excluding current appointment)
       if (validatedData.vetId || validatedData.roomId) {
@@ -110,59 +118,63 @@ export async function PATCH(
                   {
                     AND: [
                       { startAt: { lte: startAt } },
-                      { endAt: { gt: startAt } }
-                    ]
+                      { endAt: { gt: startAt } },
+                    ],
                   },
                   {
                     AND: [
                       { startAt: { lt: endAt } },
-                      { endAt: { gte: endAt } }
-                    ]
+                      { endAt: { gte: endAt } },
+                    ],
                   },
                   {
                     AND: [
                       { startAt: { gte: startAt } },
-                      { endAt: { lte: endAt } }
-                    ]
-                  }
-                ]
+                      { endAt: { lte: endAt } },
+                    ],
+                  },
+                ],
               },
               {
                 OR: [
                   validatedData.vetId ? { vetId: validatedData.vetId } : {},
-                  validatedData.roomId ? { roomId: validatedData.roomId } : {}
-                ]
+                  validatedData.roomId ? { roomId: validatedData.roomId } : {},
+                ],
               },
               {
-                status: { not: 'cancelled' }
-              }
-            ]
+                status: { not: "cancelled" },
+              },
+            ],
           },
           include: {
             vet: true,
-            room: true
-          }
-        })
+            room: true,
+          },
+        });
 
         if (conflicts.length > 0) {
-          const conflict = conflicts[0]
+          const conflict = conflicts[0];
           return NextResponse.json(
             {
               success: false,
-              error: `Scheduling conflict detected. ${conflict.vet?.name || 'The selected vet'} or ${conflict.room?.name || 'the selected room'} is already booked from ${conflict.startAt.toLocaleTimeString()} to ${conflict.endAt.toLocaleTimeString()}.`
+              error: `Scheduling conflict detected. ${
+                conflict.vet?.name || "The selected vet"
+              } or ${
+                conflict.room?.name || "the selected room"
+              } is already booked from ${conflict.startAt.toLocaleTimeString()} to ${conflict.endAt.toLocaleTimeString()}.`,
             },
             { status: 409 }
-          )
+          );
         }
       }
     }
 
     // Handle resource assignments
     if (validatedData.vetId !== undefined) {
-      updateData.vetId = validatedData.vetId || null
+      updateData.vetId = validatedData.vetId || null;
     }
     if (validatedData.roomId !== undefined) {
-      updateData.roomId = validatedData.roomId || null
+      updateData.roomId = validatedData.roomId || null;
     }
 
     const appointment = await prisma.appointment.update({
@@ -170,44 +182,44 @@ export async function PATCH(
       data: updateData,
       include: {
         vet: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         room: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         owner: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         pet: {
-          select: { id: true, name: true }
-        }
-      }
-    })
+          select: { id: true, name: true },
+        },
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      data: appointment
-    })
+      data: appointment,
+    });
   } catch (error) {
-    console.error('Error updating appointment:', error)
-    
-    if (error instanceof Error && error.name === 'ZodError') {
+    console.error("Error updating appointment:", error);
+
+    if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid appointment data provided'
+          error: "Invalid appointment data provided",
         },
         { status: 400 }
-      )
+      );
     }
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update appointment'
+        error: "Failed to update appointment",
       },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -217,32 +229,35 @@ export async function DELETE(
 ) {
   try {
     await prisma.appointment.delete({
-      where: { id: params.id }
-    })
+      where: { id: params.id },
+    });
 
     return NextResponse.json({
       success: true,
-      message: 'Appointment deleted successfully'
-    })
+      message: "Appointment deleted successfully",
+    });
   } catch (error) {
-    console.error('Error deleting appointment:', error)
-    
-    if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
+    console.error("Error deleting appointment:", error);
+
+    if (
+      error instanceof Error &&
+      error.message.includes("Record to delete does not exist")
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Appointment not found'
+          error: "Appointment not found",
         },
         { status: 404 }
-      )
+      );
     }
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to delete appointment'
+        error: "Failed to delete appointment",
       },
       { status: 500 }
-    )
+    );
   }
 }

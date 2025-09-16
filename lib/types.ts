@@ -33,9 +33,7 @@ export const AppointmentSchema = z.object({
     .min(1, "End time required")
     .transform((val) => new Date(val)),
   vetId: z.string().min(1, "Please select a vet"),
-  roomId: z.string().min(1, "Please select a room"),
-  ownerId: z.string().min(1, "Please select a owner"),
-  petId: z.string().min(1, "Please select a pet"),
+  roomId: z.string().min(1, "Please select a room")
 });
 
 export const CreateAppointmentSchema = AppointmentSchema.omit({
