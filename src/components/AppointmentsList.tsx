@@ -2,7 +2,6 @@ import { Appointment } from "@/lib/types";
 import AppointmentCard from "./AppointmentCard";
 import AppointmentListItem from "./AppointmentListItem";
 import EmptyState from "./EmptyState";
-import { User } from "lucide-react";
 
 export type ViewType = "card" | "list";
 
@@ -32,9 +31,8 @@ export default function AppointmentsList({
     );
   }
 
-  const sortedAppointments = appointments.sort(
-    (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
-  );
+  // Don't sort here since API already returns sorted data
+  const appointmentsToRender = appointments;
 
   if (viewType === "list") {
     return (
@@ -45,19 +43,16 @@ export default function AppointmentsList({
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Pet & Owner
+                    Pet
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Owner
+                    Owner
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Veterinarian
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Room
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Time
@@ -71,7 +66,7 @@ export default function AppointmentsList({
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedAppointments.map((appointment) => (
+                {appointmentsToRender.map((appointment) => (
                   <AppointmentListItem
                     key={appointment.id}
                     appointment={appointment}
@@ -89,7 +84,7 @@ export default function AppointmentsList({
 
   return (
     <div className="grid gap-4">
-      {sortedAppointments.map((appointment) => (
+      {appointmentsToRender.map((appointment) => (
         <AppointmentCard
           key={appointment.id}
           appointment={appointment}

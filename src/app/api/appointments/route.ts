@@ -6,6 +6,13 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "2");
+
+    // Validate pagination parameters
+    const currentPage = Math.max(1, page);
+    const pageSize = Math.max(1, Math.min(100, limit)); // Max 100 items per page
+    const skip = (currentPage - 1) * pageSize;
 
     let whereCondition = {};
 
@@ -22,8 +29,15 @@ export async function GET(request: NextRequest) {
           lte: endOfDay,
         },
       };
+      console.log({date,startOfDay,endOfDay})
     }
 
+    // Get total count for pagination
+    const totalCount = await prisma.appointment.count({
+      where: whereCondition,
+    });
+
+    // Get paginated appointments
     const appointments = await prisma.appointment.findMany({
       where: whereCondition,
       include: {
@@ -43,11 +57,26 @@ export async function GET(request: NextRequest) {
       orderBy: {
         startAt: "asc",
       },
+      skip,
+      take: pageSize,
     });
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const hasNextPage = currentPage < totalPages;
+    const hasPreviousPage = currentPage > 1;
 
     return NextResponse.json({
       success: true,
       data: appointments,
+      pagination: {
+        currentPage,
+        totalPages,
+        totalCount,
+        pageSize,
+        hasNextPage,
+        hasPreviousPage,
+      },
     });
   } catch (error) {
     console.error("Error fetching appointments:", error);

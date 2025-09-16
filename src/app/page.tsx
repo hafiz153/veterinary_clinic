@@ -13,6 +13,7 @@ import PageHeader from "../components/PageHeader";
 import SearchAndFilters from "../components/SearchAndFilters";
 import AppointmentsList from "../components/AppointmentsList";
 import ViewToggle from "../components/ViewToggle";
+import Pagination from "../components/ui/Pagination";
 
 export type ViewType = "card" | "list";
 
@@ -21,21 +22,39 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
+  const [editingAppointment, setEditingAppointment] =
+    useState<Appointment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<AppointmentStatusType | "all">("all");
-  const [typeFilter, setTypeFilter] = useState<AppointmentTypeType | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    AppointmentStatusType | "all"
+  >("all");
+  const [typeFilter, setTypeFilter] = useState<AppointmentTypeType | "all">(
+    "all"
+  );
   const [viewType, setViewType] = useState<ViewType>("list");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    pageSize: 10,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = async (page = 1, limit = pageSize) => {
     try {
       setLoading(true);
       const today = getUTCTodayDateString();
-      const response = await fetch(`/api/appointments?date=${today}`);
+      const response = await fetch(
+        `/api/appointments?date=${today}&page=${page}&limit=${limit}`
+      );
       const result = await response.json();
 
       if (result.success) {
         setAppointments(result.data);
+        setPagination(result.pagination);
         setError(null);
       } else {
         setError(result.error || "Failed to fetch appointments");
@@ -48,8 +67,17 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    fetchAppointments(currentPage, pageSize);
+  }, [currentPage, pageSize]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   const handleAddAppointment = () => {
     setEditingAppointment(null);
@@ -62,7 +90,7 @@ export default function HomePage() {
   };
 
   const handleAppointmentSaved = () => {
-    fetchAppointments();
+    fetchAppointments(currentPage, pageSize);
     setIsModalOpen(false);
     setEditingAppointment(null);
   };
@@ -77,7 +105,7 @@ export default function HomePage() {
       const result = await response.json();
 
       if (result.success) {
-        fetchAppointments();
+        fetchAppointments(currentPage, pageSize);
       } else {
         setError(result.error || "Failed to delete appointment");
       }
@@ -93,7 +121,8 @@ export default function HomePage() {
       appointment.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.type.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || appointment.status === statusFilter;
     const matchesType = typeFilter === "all" || appointment.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
@@ -111,7 +140,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       <PageHeader onAddAppointment={handleAddAppointment} />
-      
+
       <SearchAndFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -132,7 +161,9 @@ export default function HomePage() {
       {filteredAppointments.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Showing {filteredAppointments.length} of {appointments.length} appointments
+            Showing {(currentPage - 1) * pageSize + 1} to{" "}
+            {Math.min(currentPage * pageSize, pagination?.totalCount)} of{" "}
+            {pagination?.totalCount} appointments
           </p>
           <ViewToggle viewType={viewType} setViewType={setViewType} />
         </div>
@@ -140,12 +171,24 @@ export default function HomePage() {
 
       <AppointmentsList
         appointments={filteredAppointments}
-        totalAppointments={appointments.length}
+        totalAppointments={pagination?.totalCount}
         viewType={viewType}
         onEdit={handleEditAppointment}
         onDelete={handleDeleteAppointment}
         onAddAppointment={handleAddAppointment}
       />
+
+      {/* Pagination */}
+      {pagination?.totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={pagination?.totalPages}
+          totalCount={pagination?.totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      )}
 
       {/* Modal */}
       <AppointmentModal
