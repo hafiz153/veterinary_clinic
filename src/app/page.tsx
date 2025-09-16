@@ -9,7 +9,7 @@ import {
   AppointmentStatusType,
   AppointmentTypeType,
 } from "@/lib/types";
-import { getTodayDateString } from "@/lib/utils";
+import { getUTCTodayDateString } from "@/lib/utils";
 import AppointmentCard from "../components/AppointmentCard";
 import AppointmentModal from "../components/AppointmentModal";
 
@@ -31,7 +31,7 @@ export default function HomePage() {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const today = getTodayDateString();
+      const today = getUTCTodayDateString();
       const response = await fetch(`/api/appointments?date=${today}`);
       const result = await response.json();
 
@@ -116,7 +116,7 @@ export default function HomePage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-primary-600">
-            Today's Appointmentstttt
+            Today's Appointments
           </h1>
           <p className="text-gray-600">
             Manage your veterinary appointments for{" "}

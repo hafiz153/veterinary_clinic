@@ -1,73 +1,76 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
-import { CreateAppointmentSchema } from '@/lib/types'
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { CreateAppointmentSchema } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const date = searchParams.get('date')
-    
-    let whereCondition = {}
-    
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get("date");
+
+    let whereCondition = {};
+
     if (date) {
-      const startOfDay = new Date(date)
-      startOfDay.setHours(0, 0, 0, 0)
-      const endOfDay = new Date(date)
-      endOfDay.setHours(23, 59, 59, 999)
-      
+      const startOfDay = new Date(date);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(date);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
       whereCondition = {
         startAt: {
           gte: startOfDay,
           lte: endOfDay,
         },
-      }
+      };
     }
 
     const appointments = await prisma.appointment.findMany({
       where: whereCondition,
       include: {
         vet: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         room: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         owner: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         pet: {
-          select: { id: true, name: true }
-        }
+          select: { id: true, name: true },
+        },
       },
       orderBy: {
-        startAt: 'asc'
-      }
-    })
+        startAt: "asc",
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      data: appointments
-    })
+      data: appointments,
+    });
   } catch (error) {
-    console.error('Error fetching appointments:', error)
+    console.error("Error fetching appointments:", error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch appointments'
+        error: "Failed to fetch appointments",
       },
       { status: 500 }
-    )
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const validatedData = CreateAppointmentSchema.parse(body)
-    
+    const body = await request.json();
+    const validatedData = CreateAppointmentSchema.parse(body);
+
     // Parse the startAt datetime
-    const startAt = new Date(validatedData.startAt)
-    const endAt = new Date(startAt.getTime() + validatedData.duration * 60 * 1000)
+    const startAt = new Date(validatedData.startAt);
+    const endAt = new Date(
+      startAt.getTime() + validatedData.duration * 60 * 1000
+    );
 
     // Check for conflicts if vet or room is specified
     if (validatedData.vetId || validatedData.roomId) {
@@ -79,49 +82,50 @@ export async function POST(request: NextRequest) {
                 {
                   AND: [
                     { startAt: { lte: startAt } },
-                    { endAt: { gt: startAt } }
-                  ]
+                    { endAt: { gt: startAt } },
+                  ],
                 },
                 {
-                  AND: [
-                    { startAt: { lt: endAt } },
-                    { endAt: { gte: endAt } }
-                  ]
+                  AND: [{ startAt: { lt: endAt } }, { endAt: { gte: endAt } }],
                 },
                 {
                   AND: [
                     { startAt: { gte: startAt } },
-                    { endAt: { lte: endAt } }
-                  ]
-                }
-              ]
+                    { endAt: { lte: endAt } },
+                  ],
+                },
+              ],
             },
             {
               OR: [
                 validatedData.vetId ? { vetId: validatedData.vetId } : {},
-                validatedData.roomId ? { roomId: validatedData.roomId } : {}
-              ]
+                validatedData.roomId ? { roomId: validatedData.roomId } : {},
+              ],
             },
             {
-              status: { not: 'cancelled' }
-            }
-          ]
+              status: { not: "cancelled" },
+            },
+          ],
         },
         include: {
           vet: true,
-          room: true
-        }
-      })
+          room: true,
+        },
+      });
 
       if (conflicts.length > 0) {
-        const conflict = conflicts[0]
+        const conflict = conflicts[0];
         return NextResponse.json(
           {
             success: false,
-            error: `Scheduling conflict detected. ${conflict.vet?.name || 'The selected vet'} or ${conflict.room?.name || 'the selected room'} is already booked from ${conflict.startAt.toLocaleTimeString()} to ${conflict.endAt.toLocaleTimeString()}.`
+            error: `Scheduling conflict detected. ${
+              conflict.vet?.name || "The selected vet"
+            } or ${
+              conflict.room?.name || "the selected room"
+            } is already booked from ${conflict.startAt.toLocaleTimeString()} to ${conflict.endAt.toLocaleTimeString()}.`,
           },
           { status: 409 }
-        )
+        );
       }
     }
 
@@ -140,37 +144,37 @@ export async function POST(request: NextRequest) {
       },
       include: {
         vet: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         room: {
-          select: { id: true, name: true }
-        }
-      }
-    })
+          select: { id: true, name: true },
+        },
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      data: appointment
-    })
+      data: appointment,
+    });
   } catch (error) {
-    console.error('Error creating appointment:', error)
-    
-    if (error instanceof Error && error.name === 'ZodError') {
+    console.error("Error creating appointment:", error);
+
+    if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid appointment data provided'
+          error: "Invalid appointment data provided",
         },
         { status: 400 }
-      )
+      );
     }
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to create appointment'
+        error: "Failed to create appointment",
       },
       { status: 500 }
-    )
+    );
   }
 }
