@@ -45,13 +45,14 @@ export default function AppointmentModal({
     defaultValues: {
       petName: "",
       ownerName: "",
-      type: "checkup",
+      type: "",
       status: "pending",
       duration: 30,
       startAt: "",
       notes: "",
     },
   });
+  console.log({ errors });
 
   // Load vets and rooms when modal opens
   useEffect(() => {
@@ -93,7 +94,7 @@ export default function AppointmentModal({
       reset({
         petName: "",
         ownerName: "",
-        type: "checkup",
+        type: "",
         status: "pending",
         duration: 30,
         startAt: `${todayDate}T${currentTime}`,
@@ -221,12 +222,13 @@ export default function AppointmentModal({
             </div>
 
             {/* Appointment Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Type *
                 </label>
                 <select {...register("type")} className="input">
+                  <option selected value="">Select a type</option>
                   <option value="checkup">Checkup</option>
                   <option value="vaccination">Vaccination</option>
                   <option value="surgery">Surgery</option>
@@ -234,9 +236,14 @@ export default function AppointmentModal({
                   <option value="grooming">Grooming</option>
                   <option value="dental">Dental</option>
                 </select>
+                {errors.type && (
+                  <p className="text-danger-600 text-sm mt-1">
+                    {errors.type.message}
+                  </p>
+                )}
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
                 </label>
@@ -245,7 +252,7 @@ export default function AppointmentModal({
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -267,6 +274,46 @@ export default function AppointmentModal({
               </div>
             </div>
 
+            {/* Resources */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Veterinarian
+                </label>
+                <select {...register("vetId")} className="input">
+                  <option value="">Select a vet</option>
+                  {vets.map((vet) => (
+                    <option key={vet.id} value={vet.id}>
+                      {vet.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.vetId && (
+                  <p className="text-danger-600 text-sm mt-1">
+                    {errors.vetId.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Room
+                </label>
+                <select {...register("roomId")} className="input">
+                  <option value="">Select a room</option>
+                  {rooms.map((room) => (
+                    <option key={room.id} value={room.id}>
+                      {room.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.roomId && (
+                  <p className="text-danger-600 text-sm mt-1">
+                    {errors.roomId.message}
+                  </p>
+                )}
+              </div>
+            </div>
             {/* Schedule */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -283,37 +330,6 @@ export default function AppointmentModal({
                     {errors.startAt.message}
                   </p>
                 )}
-              </div>
-            </div>
-
-            {/* Resources */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Veterinarian
-                </label>
-                <select {...register("vetId")} className="input">
-                  <option value="">Select a vet</option>
-                  {vets.map((vet) => (
-                    <option key={vet.id} value={vet.id}>
-                      {vet.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Room
-                </label>
-                <select {...register("roomId")} className="input">
-                  <option value="">Select a room</option>
-                  {rooms.map((room) => (
-                    <option key={room.id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
 

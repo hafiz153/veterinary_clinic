@@ -1,32 +1,31 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter } from "lucide-react";
-// import AppointmentCard from "@/components/AppointmentCard";
-// import AppointmentModal from "@/components/AppointmentModal";
+import { Plus } from "lucide-react";
 import {
   Appointment,
   AppointmentStatusType,
   AppointmentTypeType,
 } from "@/lib/types";
 import { getUTCTodayDateString } from "@/lib/utils";
-import AppointmentCard from "../components/AppointmentCard";
 import AppointmentModal from "../components/AppointmentModal";
+import PageHeader from "../components/PageHeader";
+import SearchAndFilters from "../components/SearchAndFilters";
+import AppointmentsList from "../components/AppointmentsList";
+import ViewToggle from "../components/ViewToggle";
+
+export type ViewType = "card" | "list";
 
 export default function HomePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAppointment, setEditingAppointment] =
-    useState<Appointment | null>(null);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    AppointmentStatusType | "all"
-  >("all");
-  const [typeFilter, setTypeFilter] = useState<AppointmentTypeType | "all">(
-    "all"
-  );
+  const [statusFilter, setStatusFilter] = useState<AppointmentStatusType | "all">("all");
+  const [typeFilter, setTypeFilter] = useState<AppointmentTypeType | "all">("all");
+  const [viewType, setViewType] = useState<ViewType>("list");
 
   const fetchAppointments = async () => {
     try {
@@ -94,8 +93,7 @@ export default function HomePage() {
       appointment.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.type.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "all" || appointment.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
     const matchesType = typeFilter === "all" || appointment.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
@@ -112,77 +110,16 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-primary-600">
-            Today's Appointments
-          </h1>
-          <p className="text-gray-600">
-            Manage your veterinary appointments for{" "}
-            {new Date().toLocaleDateString()}
-          </p>
-        </div>
-        <button
-          onClick={handleAddAppointment}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus size={20} />
-          Add Appointment
-        </button>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="card">
-        <div className="card-content">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Search by pet name, owner, or appointment type..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input pl-10"
-              />
-            </div>
-            <div className="flex gap-4">
-              <select
-                value={statusFilter}
-                onChange={(e) =>
-                  setStatusFilter(
-                    e.target.value as AppointmentStatusType | "all"
-                  )
-                }
-                className="input w-auto"
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-              <select
-                value={typeFilter}
-                onChange={(e) =>
-                  setTypeFilter(e.target.value as AppointmentTypeType | "all")
-                }
-                className="input w-auto"
-              >
-                <option value="all">All Types</option>
-                <option value="vaccination">Vaccination</option>
-                <option value="checkup">Checkup</option>
-                <option value="surgery">Surgery</option>
-                <option value="emergency">Emergency</option>
-                <option value="grooming">Grooming</option>
-                <option value="dental">Dental</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader onAddAppointment={handleAddAppointment} />
+      
+      <SearchAndFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+      />
 
       {/* Error Message */}
       {error && (
@@ -191,54 +128,24 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Appointments List */}
-      <div className="space-y-4">
-        {filteredAppointments.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">📅</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {appointments.length === 0
-                ? "No appointments scheduled"
-                : "No appointments match your filters"}
-            </h3>
-            <p className="text-gray-600 mb-4">
-              {appointments.length === 0
-                ? "Get started by scheduling your first appointment."
-                : "Try adjusting your search or filter criteria."}
-            </p>
-            {appointments.length === 0 && (
-              <button onClick={handleAddAppointment} className="btn-primary">
-                Schedule First Appointment
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-600">
-                Showing {filteredAppointments.length} of {appointments.length}{" "}
-                appointments
-              </p>
-            </div>
-            <div className="grid gap-4">
-              {filteredAppointments
-                .sort(
-                  (a, b) =>
-                    new Date(a.startAt).getTime() -
-                    new Date(b.startAt).getTime()
-                )
-                .map((appointment) => (
-                  <AppointmentCard
-                    key={appointment.id}
-                    appointment={appointment}
-                    onEdit={handleEditAppointment}
-                    onDelete={handleDeleteAppointment}
-                  />
-                ))}
-            </div>
-          </>
-        )}
-      </div>
+      {/* View Toggle and Results Count */}
+      {filteredAppointments.length > 0 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Showing {filteredAppointments.length} of {appointments.length} appointments
+          </p>
+          <ViewToggle viewType={viewType} setViewType={setViewType} />
+        </div>
+      )}
+
+      <AppointmentsList
+        appointments={filteredAppointments}
+        totalAppointments={appointments.length}
+        viewType={viewType}
+        onEdit={handleEditAppointment}
+        onDelete={handleDeleteAppointment}
+        onAddAppointment={handleAddAppointment}
+      />
 
       {/* Modal */}
       <AppointmentModal
