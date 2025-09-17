@@ -14,6 +14,7 @@ import SearchAndFilters from "../components/SearchAndFilters";
 import AppointmentsList from "../components/AppointmentsList";
 import Pagination from "../components/ui/Pagination";
 import AppointmentViewModal from "../components/AppointmentViewModal";
+import PageFooter from "../components/PageFooter";
 
 export type ViewType = "card" | "list";
 
@@ -198,6 +199,7 @@ export default function HomePage() {
         onClose={() => setIsViewModalOpen(false)}
         appointment={viewingAppointment}
       />
+      <PageFooter />
     </div>
   );
 }

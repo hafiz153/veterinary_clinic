@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "2");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
     // Validate pagination parameters
     const currentPage = Math.max(1, page);
@@ -45,12 +45,6 @@ export async function GET(request: NextRequest) {
           select: { id: true, name: true },
         },
         room: {
-          select: { id: true, name: true },
-        },
-        owner: {
-          select: { id: true, name: true },
-        },
-        pet: {
           select: { id: true, name: true },
         },
       },

@@ -16,12 +16,12 @@ export async function GET(
         room: {
           select: { id: true, name: true },
         },
-        owner: {
-          select: { id: true, name: true },
-        },
-        pet: {
-          select: { id: true, name: true },
-        },
+        // owner: {
+        //   select: { id: true, name: true },
+        // },
+        // pet: {
+        //   select: { id: true, name: true },
+        // },
       },
     });
     console.log({ appointment });
@@ -187,12 +187,12 @@ export async function PATCH(
         room: {
           select: { id: true, name: true },
         },
-        owner: {
-          select: { id: true, name: true },
-        },
-        pet: {
-          select: { id: true, name: true },
-        },
+        // owner: {
+        //   select: { id: true, name: true },
+        // },
+        // pet: {
+        //   select: { id: true, name: true },
+        // },
       },
     });
 
