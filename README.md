@@ -6,6 +6,7 @@ A modern Next.js application for managing veterinary clinic appointments with co
 
 - ✅ **Appointments Management**: View, add, edit, and delete appointments
 - ✅ **Conflict Detection**: Prevents overlapping appointments for vets and rooms and time.
+- ✅ **No Past Dates**:  Only future appointments allowed
 - ✅ **Real-time Status Updates**: Mark appointments as pending, completed, or cancelled
 - ✅ **Search & Filter**: Filter by status, type, or search by pet/owner names
 - ✅ **Professional UI**: Clean Tailwind CSS design suitable for veterinary clinics
@@ -94,7 +95,7 @@ The application uses the following main entities:
 
 The system prevents scheduling conflicts by checking for overlapping appointments when the same vet or room is assigned at same time. This is implemented in the API layer with comprehensive time range checking.
 
-same Vat + same room + same time ==conflict
+same Vat + same room + same time = conflict
 
 ### Search and Filtering
 
