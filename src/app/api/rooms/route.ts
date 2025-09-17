@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { RoomGetErrorResponse, RoomGetResponse } from '@/lib/types'
 
 export async function GET() {
   try {
@@ -7,13 +8,13 @@ export async function GET() {
       orderBy: { name: 'asc' }
     })
 
-    return NextResponse.json({
+    return NextResponse.json<RoomGetResponse>({
       success: true,
       data: rooms
     })
   } catch (error) {
     console.error('Error fetching rooms:', error)
-    return NextResponse.json(
+    return NextResponse.json<RoomGetErrorResponse>(
       {
         success: false,
         error: 'Failed to fetch rooms'

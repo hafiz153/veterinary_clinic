@@ -7,10 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ========================
+// Enums
+// ========================
+enum AppointmentType {
+  ''
+  vaccination
+  checkup
+  surgery
+  emergency
+  grooming
+  dental
+}
+
+enum AppointmentStatus {
+  pending
+  completed
+  cancelled
+}
+
 model Vet {
   id           String        @id @default(cuid())
   name         String        
-  email        String?       @unique
   phone        String?
   appointments Appointment[] @relation("VetAppointments")
   createdAt    DateTime      @default(now())
@@ -31,19 +49,19 @@ model Appointment {
   id        String   @id @default(cuid())
   petName   String
   ownerName String
-  type      String
-  status    String
+  type      AppointmentType
+  status    AppointmentStatus
   notes     String?
   duration  Int
   startAt   DateTime
   endAt     DateTime
 
   // Relations
-  vet   Vet?   @relation("VetAppointments", fields: [vetId], references: [id])
-  vetId String?
+  vet   Vet   @relation("VetAppointments", fields: [vetId], references: [id])
+  vetId String
 
-  room  Room?  @relation("RoomAppointments", fields: [roomId], references: [id])
-  roomId String?
+  room  Room  @relation("RoomAppointments", fields: [roomId], references: [id])
+  roomId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

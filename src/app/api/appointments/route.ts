@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { CreateAppointmentSchema } from "@/lib/types";
+import {
+  Appointment,
+  AppointmentCreateErrorResponse,
+  AppointmentCreateResponse,
+  AppointmentListResponse,
+  CreateAppointmentSchema,
+} from "@/lib/types";
+import { Prisma } from "@prisma/client";
+// import { Appointment } from "@prisma/client";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest
+): Promise<NextResponse<AppointmentListResponse>> {
   try {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
@@ -11,10 +21,10 @@ export async function GET(request: NextRequest) {
 
     // Validate pagination parameters
     const currentPage = Math.max(1, page);
-    const pageSize = Math.max(1, Math.min(100, limit)); // Max 100 items per page
+    const pageSize = Math.max(1, Math.min(100, limit));
     const skip = (currentPage - 1) * pageSize;
 
-    let whereCondition = {};
+    let whereCondition: Prisma.AppointmentWhereInput = {};
 
     if (date) {
       const startOfDay = new Date(date);
@@ -29,40 +39,30 @@ export async function GET(request: NextRequest) {
           lte: endOfDay,
         },
       };
-      console.log({ date, startOfDay, endOfDay });
     }
 
-    // Get total count for pagination
     const totalCount = await prisma.appointment.count({
       where: whereCondition,
     });
 
-    // Get paginated appointments
     const appointments = await prisma.appointment.findMany({
       where: whereCondition,
       include: {
-        vet: {
-          select: { id: true, name: true },
-        },
-        room: {
-          select: { id: true, name: true },
-        },
+        vet: { select: { id: true, name: true } },
+        room: { select: { id: true, name: true } },
       },
-      orderBy: {
-        startAt: "asc",
-      },
+      orderBy: { startAt: "asc" },
       skip,
       take: pageSize,
     });
 
-    // Calculate pagination metadata
     const totalPages = Math.ceil(totalCount / pageSize);
     const hasNextPage = currentPage < totalPages;
     const hasPreviousPage = currentPage > 1;
 
-    return NextResponse.json({
+    return NextResponse.json<AppointmentListResponse>({
       success: true,
-      data: appointments,
+      data: appointments as Appointment[], // cast because Prisma returns Date objects
       pagination: {
         currentPage,
         totalPages,
@@ -74,30 +74,31 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching appointments:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch appointments",
-      },
+    return NextResponse.json<AppointmentListResponse>(
+      { success: false, error: "Failed to fetch appointments" },
       { status: 500 }
     );
   }
 }
-export async function POST(request: NextRequest) {
+
+export async function POST(
+  request: NextRequest
+): Promise<
+  NextResponse<AppointmentCreateResponse | AppointmentCreateErrorResponse>
+> {
   try {
     const body = await request.json();
     const validatedData = CreateAppointmentSchema.parse(body);
 
-    // Parse the startAt datetime
     const startAt = new Date(validatedData.startAt);
     const endAt = new Date(
       startAt.getTime() + validatedData.duration * 60 * 1000
     );
 
-    // Check if the appointment date is in the past
+    // Check if appointment is in the past
     const now = new Date();
     if (startAt < now) {
-      return NextResponse.json(
+      return NextResponse.json<AppointmentCreateErrorResponse>(
         {
           success: false,
           error:
@@ -107,11 +108,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Optional: Check if appointment is too far in the future (e.g., 1 year)
+    // Check if appointment is more than 1 year ahead
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
     if (startAt > oneYearFromNow) {
-      return NextResponse.json(
+      return NextResponse.json<AppointmentCreateErrorResponse>(
         {
           success: false,
           error: "Cannot schedule appointments more than 1 year in advance.",
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for conflicts if vet or room is specified
+    // Check conflicts
     if (validatedData.vetId || validatedData.roomId) {
       const conflicts = await prisma.appointment.findMany({
         where: {
@@ -150,20 +151,15 @@ export async function POST(request: NextRequest) {
                 validatedData.roomId ? { roomId: validatedData.roomId } : {},
               ],
             },
-            {
-              status: { not: "cancelled" },
-            },
+            { status: { not: "cancelled" } },
           ],
         },
-        include: {
-          vet: true,
-          room: true,
-        },
+        include: { vet: true, room: true },
       });
 
       if (conflicts.length > 0) {
         const conflict = conflicts[0];
-        return NextResponse.json(
+        return NextResponse.json<AppointmentCreateErrorResponse>(
           {
             success: false,
             error: `Scheduling conflict detected. ${
@@ -187,28 +183,32 @@ export async function POST(request: NextRequest) {
         duration: validatedData.duration,
         startAt,
         endAt,
-        vetId: validatedData.vetId || null,
-        roomId: validatedData.roomId || null,
+        vetId: validatedData.vetId,
+        roomId: validatedData.roomId,
       },
       include: {
-        vet: {
-          select: { id: true, name: true },
-        },
-        room: {
-          select: { id: true, name: true },
-        },
+        vet: { select: { id: true, name: true } },
+        room: { select: { id: true, name: true } },
       },
     });
 
-    return NextResponse.json({
+    return NextResponse.json<
+      AppointmentCreateResponse | AppointmentCreateErrorResponse
+    >({
       success: true,
-      data: appointment,
+      data: {
+        ...appointment,
+        startAt: appointment.startAt.toISOString(),
+        endAt: appointment.endAt.toISOString(),
+        createdAt: appointment.createdAt.toISOString(),
+        updatedAt: appointment.updatedAt.toISOString(),
+      } as Appointment,
     });
   } catch (error) {
     console.error("Error creating appointment:", error);
 
     if (error instanceof Error && error.name === "ZodError") {
-      return NextResponse.json(
+      return NextResponse.json<AppointmentCreateErrorResponse>(
         {
           success: false,
           error: "Invalid appointment data provided",
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(
+    return NextResponse.json<AppointmentCreateErrorResponse>(
       {
         success: false,
         error: "Failed to create appointment",

@@ -12,6 +12,7 @@ import {
   type Room,
 } from "@/lib/types";
 import { getUTCTodayDateString, combineDateAndTime } from "@/lib/utils";
+import { AppointmentType } from "@prisma/client";
 
 interface AppointmentModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export default function AppointmentModal({
     defaultValues: {
       petName: "",
       ownerName: "",
-      type: "",
+      type: AppointmentType.checkup,
       status: "pending",
       duration: 30,
       startAt: "",
@@ -91,13 +92,11 @@ export default function AppointmentModal({
         const timeString = startAt.toTimeString().slice(0, 5); // HH:MM format
         const dateString = startAt.toISOString().split("T")[0]; // YYYY-MM-DD format
         
-        console.log({ EDIT: appointment });
-        
         reset({
           petName: appointment.petName,
           ownerName: appointment.ownerName,
-          type: appointment.type as any,
-          status: appointment.status as any,
+          type: appointment.type,
+          status: appointment.status,
           duration: appointment.duration,
           startAt: `${dateString}T${timeString}`,
           notes: appointment.notes || "",
@@ -113,7 +112,7 @@ export default function AppointmentModal({
         reset({
           petName: "",
           ownerName: "",
-          type: "",
+          type: AppointmentType.checkup,
           status: "pending",
           duration: 30,
           startAt: `${todayDate}T${currentTime}`,
@@ -156,7 +155,6 @@ export default function AppointmentModal({
       });
 
       const result = await response.json();
-      console.log({ result });
 
       if (result.success) {
         onSave();

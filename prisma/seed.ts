@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, AppointmentType, AppointmentStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -7,7 +7,6 @@ async function main() {
   const vet1 = await prisma.vet.create({
     data: {
       name: "Dr. Sarah Johnson",
-      email: "sarah.johnson@vetclinic.com",
       phone: "+1234567890",
     },
   });
@@ -15,7 +14,6 @@ async function main() {
   const vet2 = await prisma.vet.create({
     data: {
       name: "Dr. Mike Chen",
-      email: "mike.chen@vetclinic.com",
       phone: "+1234567891",
     },
   });
@@ -42,66 +40,16 @@ async function main() {
     },
   });
 
-  // Create owners
-  const owner1 = await prisma.owner.create({
-    data: {
-      name: "John Smith",
-      email: "john.smith@email.com",
-      phone: "+1987654321",
-    },
-  });
-
-  const owner2 = await prisma.owner.create({
-    data: {
-      name: "Emily Davis",
-      email: "emily.davis@email.com",
-      phone: "+1987654322",
-    },
-  });
-
-  const owner3 = await prisma.owner.create({
-    data: {
-      name: "Robert Wilson",
-      email: "robert.wilson@email.com",
-      phone: "+1987654323",
-    },
-  });
-
-  // Create pets
-  const pet1 = await prisma.pet.create({
-    data: {
-      name: "Buddy",
-      species: "Dog",
-      breed: "Golden Retriever",
-    },
-  });
-
-  const pet2 = await prisma.pet.create({
-    data: {
-      name: "Whiskers",
-      species: "Cat",
-      breed: "Persian",
-    },
-  });
-
-  const pet3 = await prisma.pet.create({
-    data: {
-      name: "Max",
-      species: "Dog",
-      breed: "German Shepherd",
-    },
-  });
-
   // Create appointments for today
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const appointment1 = await prisma.appointment.create({
+  await prisma.appointment.create({
     data: {
-      petName: pet1.name,
-      ownerName: owner1.name,
-      type: "Vaccination",
-      status: "pending",
+      petName: "pet1",
+      ownerName: "owner1",
+      type: AppointmentType.checkup,
+      status: AppointmentStatus.pending,
       duration: 30,
       startAt: new Date(today.getTime() + 9 * 60 * 60 * 1000), // 9 AM
       endAt: new Date(today.getTime() + 9.5 * 60 * 60 * 1000), // 9:30 AM
@@ -111,12 +59,12 @@ async function main() {
     },
   });
 
-  const appointment2 = await prisma.appointment.create({
+  await prisma.appointment.create({
     data: {
-      petName: pet2.name,
-      ownerName: owner2.name,
-      type: "Checkup",
-      status: "completed",
+      petName: "pet2",
+      ownerName: "owner2",
+      type: AppointmentType.vaccination,
+      status: AppointmentStatus.completed,
       duration: 45,
       startAt: new Date(today.getTime() + 10 * 60 * 60 * 1000), // 10 AM
       endAt: new Date(today.getTime() + 10.75 * 60 * 60 * 1000), // 10:45 AM
@@ -126,12 +74,12 @@ async function main() {
     },
   });
 
-  const appointment3 = await prisma.appointment.create({
+  await prisma.appointment.create({
     data: {
-      petName: pet3.name,
-      ownerName: owner3.name,
-      type: "Surgery",
-      status: "pending",
+      petName: "pet3",
+      ownerName: "owner3",
+      type: AppointmentType.surgery,
+      status: AppointmentStatus.cancelled,
       duration: 120,
       startAt: new Date(today.getTime() + 14 * 60 * 60 * 1000), // 2 PM
       endAt: new Date(today.getTime() + 16 * 60 * 60 * 1000), // 4 PM
@@ -141,23 +89,7 @@ async function main() {
     },
   });
 
-  console.log("Database seeded successfully!");
-  console.log({
-    vet1,
-    vet2,
-    room1,
-    room2,
-    room3,
-    owner1,
-    owner2,
-    owner3,
-    pet1,
-    pet2,
-    pet3,
-    appointment1,
-    appointment2,
-    appointment3,
-  });
+  console.log("✅ Database seeded successfully!");
 }
 
 main()
@@ -165,7 +97,7 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e);
+    console.error("❌ Seeding error:", e);
     await prisma.$disconnect();
     process.exit(1);
   });

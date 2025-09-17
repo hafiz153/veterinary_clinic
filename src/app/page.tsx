@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import {
   Appointment,
+  AppointmentListResponse,
   AppointmentStatusType,
   AppointmentTypeType,
 } from "@/lib/types";
@@ -54,7 +55,7 @@ export default function HomePage() {
       const response = await fetch(
         `/api/appointments?date=${today}&page=${page}&limit=${limit}`
       );
-      const result = await response.json();
+      const result: AppointmentListResponse = await response.json();
 
       if (result.success) {
         setAppointments(result.data);
