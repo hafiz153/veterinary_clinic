@@ -5,7 +5,7 @@ A modern Next.js application for managing veterinary clinic appointments with co
 ## Features
 
 - ✅ **Appointments Management**: View, add, edit, and delete appointments
-- ✅ **Conflict Detection**: Prevents overlapping appointments for vets and rooms
+- ✅ **Conflict Detection**: Prevents overlapping appointments for vets and rooms and time.
 - ✅ **Real-time Status Updates**: Mark appointments as pending, completed, or cancelled
 - ✅ **Search & Filter**: Filter by status, type, or search by pet/owner names
 - ✅ **Professional UI**: Clean Tailwind CSS design suitable for veterinary clinics
@@ -24,28 +24,29 @@ A modern Next.js application for managing veterinary clinic appointments with co
 
 ### Prerequisites
 
-- Node.js 18+ installed
+- Node.js installed
 - MySQL database server running
 - Git
 
 ### 1. Clone and Install
 
 ```bash
-git clone <your-repo-url>
-cd veterinary-appointments-manager
-npm install
+git clone https://github.com/hafiz153/veterinary_clinic
+cd veterinary_clinic
+yarn
 ```
 
 ### 2. Database Configuration
 
-1. Create a MySQL database named `veterinary_db`
+1. Create a MySQL database named `veterinary_clinic`
 2. Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
 3. Update the `DATABASE_URL` in `.env` with your MySQL credentials:
    ```
-   DATABASE_URL="mysql://username:password@localhost:3306/veterinary_db"
+   DATABASE_URL="mysql://username:password@localhost:3306/veterinary_clinic"   (if Authentication ebabled)
+   DATABASE_URL="mysql://root:@localhost:3306/veterinary_clinic"   (if Authentication not ebabled)
    ```
 
 ### 3. Database Setup
@@ -58,13 +59,13 @@ npx prisma generate
 npx prisma db push
 
 # Seed the database with sample data
-npm run db:seed
+yarn db:seed
 ```
 
 ### 4. Start Development Server
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 The application will be available at `http://localhost:3000`
@@ -76,8 +77,6 @@ The application uses the following main entities:
 - **Appointment**: Core appointment data with scheduling info
 - **Vet**: Veterinarian information
 - **Room**: Examination room details
-- **Owner**: Pet owner information
-- **Pet**: Pet details linked to owners
 
 ## API Endpoints
 
@@ -93,7 +92,9 @@ The application uses the following main entities:
 
 ### Conflict Detection
 
-The system prevents scheduling conflicts by checking for overlapping appointments when the same vet or room is assigned. This is implemented in the API layer with comprehensive time range checking.
+The system prevents scheduling conflicts by checking for overlapping appointments when the same vet or room is assigned at same time. This is implemented in the API layer with comprehensive time range checking.
+
+same Vat + same room + same time ==conflict
 
 ### Search and Filtering
 
@@ -114,14 +115,14 @@ This project was developed with assistance from AI tools including:
 ## Available Scripts
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run db:push      # Push schema changes to database
-npm run db:migrate   # Run database migrations
-npm run db:seed      # Seed database with sample data
-npm run db:studio    # Open Prisma Studio
+yarn dev          # Start development server
+yarn build        # Build for production
+yarn start        # Start production server
+yarn lint         # Run ESLint
+yarn db:push      # Push schema changes to database
+yarn db:migrate   # Run database migrations
+yarn db:seed      # Seed database with sample data
+yarn db:studio    # Open Prisma Studio
 ```
 
 ## Project Structure
@@ -151,10 +152,9 @@ npm run db:studio    # Open Prisma Studio
 1. Set up a production MySQL database
 2. Update the `DATABASE_URL` environment variable
 3. Run database migrations: `npx prisma db push`
-4. Build the application: `npm run build`
-5. Start the production server: `npm start`
+4. Build the application: `yarn build`
+5. Start the production server: `yarn start`
 
 ## License
 
 This project is created for educational/assessment purposes.
-
