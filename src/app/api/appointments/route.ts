@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
           lte: endOfDay,
         },
       };
-      console.log({date,startOfDay,endOfDay})
+      console.log({ date, startOfDay, endOfDay });
     }
 
     // Get total count for pagination
@@ -89,7 +89,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -100,6 +99,32 @@ export async function POST(request: NextRequest) {
     const endAt = new Date(
       startAt.getTime() + validatedData.duration * 60 * 1000
     );
+
+    // Check if the appointment date is in the past
+    const now = new Date();
+    if (startAt < now) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Cannot schedule appointments in the past. Please select a future date and time.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Optional: Check if appointment is too far in the future (e.g., 1 year)
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    if (startAt > oneYearFromNow) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Cannot schedule appointments more than 1 year in advance.",
+        },
+        { status: 400 }
+      );
+    }
 
     // Check for conflicts if vet or room is specified
     if (validatedData.vetId || validatedData.roomId) {

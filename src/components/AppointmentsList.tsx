@@ -1,5 +1,4 @@
 import { Appointment } from "@/lib/types";
-import AppointmentCard from "./AppointmentCard";
 import AppointmentListItem from "./AppointmentListItem";
 import EmptyState from "./EmptyState";
 
@@ -10,6 +9,7 @@ interface AppointmentsListProps {
   totalAppointments: number;
   viewType: ViewType;
   onEdit: (appointment: Appointment) => void;
+  onView: (appointment: Appointment) => void;
   onDelete: (id: string) => void;
   onAddAppointment: () => void;
 }
@@ -17,8 +17,8 @@ interface AppointmentsListProps {
 export default function AppointmentsList({
   appointments,
   totalAppointments,
-  viewType,
   onEdit,
+  onView,
   onDelete,
   onAddAppointment,
 }: AppointmentsListProps) {
@@ -34,7 +34,6 @@ export default function AppointmentsList({
   // Don't sort here since API already returns sorted data
   const appointmentsToRender = appointments;
 
-  if (viewType === "list") {
     return (
       <div className="card">
         <div className="card-content p-0">
@@ -55,6 +54,9 @@ export default function AppointmentsList({
                     Veterinarian
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Room
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Time
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -71,6 +73,7 @@ export default function AppointmentsList({
                     key={appointment.id}
                     appointment={appointment}
                     onEdit={onEdit}
+                    onView={onView}
                     onDelete={onDelete}
                   />
                 ))}
@@ -80,18 +83,7 @@ export default function AppointmentsList({
         </div>
       </div>
     );
-  }
+  
 
-  return (
-    <div className="grid gap-4">
-      {appointmentsToRender.map((appointment) => (
-        <AppointmentCard
-          key={appointment.id}
-          appointment={appointment}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      ))}
-    </div>
-  );
+
 }

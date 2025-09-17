@@ -43,7 +43,9 @@ export default function SearchAndFilters({
               }
               className="input w-auto"
             >
-              <option value="all">All Status</option>
+              <option value="all" className="hover:bg-primary-700">
+                All Status
+              </option>
               <option value="pending">Pending</option>
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>

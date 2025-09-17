@@ -12,8 +12,8 @@ import AppointmentModal from "../components/AppointmentModal";
 import PageHeader from "../components/PageHeader";
 import SearchAndFilters from "../components/SearchAndFilters";
 import AppointmentsList from "../components/AppointmentsList";
-import ViewToggle from "../components/ViewToggle";
 import Pagination from "../components/ui/Pagination";
+import AppointmentViewModal from "../components/AppointmentViewModal";
 
 export type ViewType = "card" | "list";
 
@@ -22,7 +22,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] =
+    useState<Appointment | null>(null);
+  const [viewingAppointment, setViewingAppointment] =
     useState<Appointment | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
@@ -87,6 +90,10 @@ export default function HomePage() {
   const handleEditAppointment = (appointment: Appointment) => {
     setEditingAppointment(appointment);
     setIsModalOpen(true);
+  };
+  const handleViewAppointment = (appointment: Appointment) => {
+    setViewingAppointment(appointment);
+    setIsViewModalOpen(true);
   };
 
   const handleAppointmentSaved = () => {
@@ -157,23 +164,12 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* View Toggle and Results Count */}
-      {filteredAppointments.length > 0 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            Showing {(currentPage - 1) * pageSize + 1} to{" "}
-            {Math.min(currentPage * pageSize, pagination?.totalCount)} of{" "}
-            {pagination?.totalCount} appointments
-          </p>
-          <ViewToggle viewType={viewType} setViewType={setViewType} />
-        </div>
-      )}
-
       <AppointmentsList
         appointments={filteredAppointments}
         totalAppointments={pagination?.totalCount}
         viewType={viewType}
         onEdit={handleEditAppointment}
+        onView={handleViewAppointment}
         onDelete={handleDeleteAppointment}
         onAddAppointment={handleAddAppointment}
       />
@@ -196,6 +192,11 @@ export default function HomePage() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleAppointmentSaved}
         appointment={editingAppointment}
+      />
+      <AppointmentViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        appointment={viewingAppointment}
       />
     </div>
   );

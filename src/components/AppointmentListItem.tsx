@@ -1,15 +1,17 @@
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2, Trash2, View } from "lucide-react";
 import { Appointment } from "@/lib/types";
 
 interface AppointmentListItemProps {
   appointment: Appointment;
   onEdit: (appointment: Appointment) => void;
+  onView: (appointment: Appointment) => void;
   onDelete: (id: string) => void;
 }
 
 export default function AppointmentListItem({
   appointment,
   onEdit,
+  onView,
   onDelete,
 }: AppointmentListItemProps) {
   const formatTime = (dateString: string | Date) => {
@@ -118,6 +120,13 @@ export default function AppointmentListItem({
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => onView(appointment)}
+            className="text-primary-600 hover:text-primary-700 p-1 rounded-md hover:bg-primary-50 transition-colors"
+            title="Edit appointment"
+          >
+            <View size={16} />
+          </button>
           <button
             onClick={() => onEdit(appointment)}
             className="text-primary-600 hover:text-primary-700 p-1 rounded-md hover:bg-primary-50 transition-colors"
