@@ -95,29 +95,19 @@ The application uses the following main entities:
 
 The system prevents scheduling conflicts by checking for overlapping appointments when the same vet or room is assigned at same time. This is implemented in the API layer with comprehensive time range checking.
 
-In a nutshell: 
-❌ Conflict cases:
+#### ❌ Conflict cases:
 
+- Same Vet + Same Room + Same Time
+- Same Vet + Different Room + Same Time
+- Different Vet + Same Room + Same Time
 
-Same Vet + Same Room + Same Time….
+### ✅ Eligible cases:
 
-
-Same Vet + Different Room + Same Time…
-
-
-Different Vet + Same Room + Same Time….
-✅ Eligible cases:
-
-
-Same Vet + Same Room + Different Time…
-Same Vet + Different Room + Different Time…
-Different Vet + Same Room + Different Time…
-
-
-Different Vet + Different Room + Same Time
-
-
-Different Vet + Different Room + Different Time
+- Same Vet + Same Room + Different Time
+- Same Vet + Different Room + Different Time
+- Different Vet + Same Room + Different Time
+- Different Vet + Different Room + Same Time
+- Different Vet + Different Room + Different Time
 
 
 ### Search and Filtering
@@ -182,3 +172,4 @@ yarn db:studio    # Open Prisma Studio
 ## License
 
 This project is created for educational/assessment purposes.
+
