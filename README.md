@@ -95,7 +95,30 @@ The application uses the following main entities:
 
 The system prevents scheduling conflicts by checking for overlapping appointments when the same vet or room is assigned at same time. This is implemented in the API layer with comprehensive time range checking.
 
-same Vat + same room + same time = conflict
+In a nutshell: 
+❌ Conflict cases:
+
+
+Same Vet + Same Room + Same Time….
+
+
+Same Vet + Different Room + Same Time…
+
+
+Different Vet + Same Room + Same Time….
+✅ Eligible cases:
+
+
+Same Vet + Same Room + Different Time…
+Same Vet + Different Room + Different Time…
+Different Vet + Same Room + Different Time…
+
+
+Different Vet + Different Room + Same Time
+
+
+Different Vet + Different Room + Different Time
+
 
 ### Search and Filtering
 

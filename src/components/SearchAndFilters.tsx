@@ -53,6 +53,7 @@ export default function SearchAndFilters({
               onChange={(e) =>
                 setTypeFilter(e.target.value as AppointmentTypeType | "all")
               }
+               className="input w-auto"
             >
               <option value="all">All Types</option>
               <option value="vaccination">Vaccination</option>
