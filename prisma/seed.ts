@@ -1,4 +1,8 @@
-import { PrismaClient, AppointmentType, AppointmentStatus } from "@prisma/client";
+import {
+  PrismaClient,
+  AppointmentType,
+  AppointmentStatus,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -83,6 +87,150 @@ async function main() {
       duration: 120,
       startAt: new Date(today.getTime() + 14 * 60 * 60 * 1000), // 2 PM
       endAt: new Date(today.getTime() + 16 * 60 * 60 * 1000), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+  await prisma.appointment.create({
+    data: {
+      petName: "pet4",
+      ownerName: "owner4",
+      type: AppointmentType.dental,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 15 * 60 * 60 * 1000), // 2 PM
+      endAt: new Date(today.getTime() + 17 * 60 * 60 * 1000), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      petName: "pet5",
+      ownerName: "owner5",
+      type: AppointmentType.emergency,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 16 * 60 * 60 * 1000), // 2 PM
+      endAt: new Date(today.getTime() + 17 * 60 * 60 * 1000), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+  await prisma.appointment.create({
+    data: {
+      petName: "pet6",
+      ownerName: "owner6",
+      type: AppointmentType.grooming,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 17 * 60 * 60 * 1000), // 2 PM
+      endAt: new Date(today.getTime() + 17 * 60 * 60 * 1000 + 30), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      petName: "pet6",
+      ownerName: "owner6",
+      type: AppointmentType.dental,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 17 * 60 * 60 * 1000 + 30), // 2 PM
+      endAt: new Date(today.getTime() + 18 * 60 * 60 * 1000), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+  await prisma.appointment.create({
+    data: {
+      petName: "pet7",
+      ownerName: "owner7",
+      type: AppointmentType.surgery,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 18 * 60 * 60 * 1000), // 2 PM
+      endAt: new Date(today.getTime() + 18 * 60 * 60 * 1000 + 30), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      petName: "pet8",
+      ownerName: "owner8",
+      type: AppointmentType.emergency,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 18 * 60 * 60 * 1000 + 30), // 2 PM
+      endAt: new Date(today.getTime() + 19 * 60 * 60 * 1000), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+
+  await prisma.appointment.create({
+    data: {
+      petName: "pet8",
+      ownerName: "owner8",
+      type: AppointmentType.surgery,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 19 * 60 * 60 * 1000), // 2 PM
+      endAt: new Date(today.getTime() + 19 * 60 * 60 * 1000 + 30), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+  await prisma.appointment.create({
+    data: {
+      petName: "pet9",
+      ownerName: "owner9",
+      type: AppointmentType.vaccination,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 19 * 60 * 60 * 1000 + 30), // 2 PM
+      endAt: new Date(today.getTime() + 20 * 60 * 60 * 1000), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+  await prisma.appointment.create({
+    data: {
+      petName: "pet10",
+      ownerName: "owner10",
+      type: AppointmentType.surgery,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 20 * 60 * 60 * 1000), // 2 PM
+      endAt: new Date(today.getTime() + 20 * 60 * 60 * 1000 + 30), // 4 PM
+      vetId: vet1.id,
+      roomId: room3.id,
+      notes: "Spay surgery",
+    },
+  });
+  await prisma.appointment.create({
+    data: {
+      petName: "pet11",
+      ownerName: "owner11",
+      type: AppointmentType.surgery,
+      status: AppointmentStatus.pending,
+      duration: 120,
+      startAt: new Date(today.getTime() + 20 * 60 * 60 * 1000 + 30), // 2 PM
+      endAt: new Date(today.getTime() + 21 * 60 * 60 * 1000), // 4 PM
       vetId: vet1.id,
       roomId: room3.id,
       notes: "Spay surgery",

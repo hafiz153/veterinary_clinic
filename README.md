@@ -4,14 +4,15 @@ A modern Next.js application for managing veterinary clinic appointments with co
 
 ## Features
 
-- ✅ **Appointments Management**: View, add, edit, and delete appointments
+- ✅ **Appointments Management**: View, add, edit, and delete appointments.
+- ✅ **Pagination**: Added pagination for getting recent 10 appointments very quickly.
 - ✅ **Conflict Detection**: Prevents overlapping appointments for vets and rooms and time.
-- ✅ **No Past Dates**:  Only future appointments allowed
-- ✅ **Real-time Status Updates**: Mark appointments as pending, completed, or cancelled
-- ✅ **Search & Filter**: Filter by status, type, or search by pet/owner names
-- ✅ **Professional UI**: Clean Tailwind CSS design suitable for veterinary clinics
-- ✅ **TypeScript**: Full type safety throughout the application
-- ✅ **Error Handling**: Comprehensive error handling with user feedback
+- ✅ **No Past Dates**: Only future appointments allowed.
+- ✅ **Real-time Status Updates**: Mark appointments as pending, completed, or cancelled.
+- ✅ **Search & Filter**: Filter by status, type, or search by pet/owner names.
+- ✅ **Professional UI**: Clean Tailwind CSS design suitable for veterinary clinics.
+- ✅ **TypeScript**: Full type safety throughout the application.
+- ✅ **Error Handling**: Comprehensive error handling with user feedback.
 
 ## Tech Stack
 
@@ -54,13 +55,16 @@ yarn
 
 ```bash
 # Generate Prisma client
-npx prisma generate
+yarn postinstall
 
 # Run migrations to create tables
-npx prisma db push
+yarn db:push
 
 # Seed the database with sample data
 yarn db:seed
+
+# See the database, tables and records in Prisma studio
+yarn db:studio
 ```
 
 ### 4. Start Development Server
@@ -81,7 +85,7 @@ The application uses the following main entities:
 
 ## API Endpoints
 
-- `GET /api/appointments` - List appointments (with date filtering)
+- `GET /api/appointments` - List appointments (with date filtering and pagination)
 - `POST /api/appointments` - Create new appointment
 - `GET /api/appointments/[id]` - Get single appointment
 - `PATCH /api/appointments/[id]` - Update appointment
@@ -101,14 +105,13 @@ The system prevents scheduling conflicts by checking for overlapping appointment
 - Same Vet + Different Room + Same Time
 - Different Vet + Same Room + Same Time
 
-### ✅ Eligible cases:
+#### ✅ Eligible cases:
 
 - Same Vet + Same Room + Different Time
 - Same Vet + Different Room + Different Time
 - Different Vet + Same Room + Different Time
 - Different Vet + Different Room + Same Time
 - Different Vet + Different Room + Different Time
-
 
 ### Search and Filtering
 
@@ -172,4 +175,3 @@ yarn db:studio    # Open Prisma Studio
 ## License
 
 This project is created for educational/assessment purposes.
-
